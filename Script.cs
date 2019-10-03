@@ -1,8 +1,9 @@
 
 // Isy's Inventory Manager
+// Modded by Dorimanx
 // ===================
-// Version: 2.6.4
-// Date: 2019-06-23
+// Version: 2.6.5
+// Date: 2019-10-04
 
 //  =======================================================================================
 //                                                                            --- Configuration ---
@@ -19,11 +20,19 @@ const string toolContainerKeyword = "Tools";
 const string ammoContainerKeyword = "Ammo";
 const string bottleContainerKeyword = "Bottles";
 
+//Dorimanx Note, I have changed script update frequency (default was UpdateFrequency.Update10, to reduce program block load i have set:
+// Runtime.UpdateFrequency |= UpdateFrequency.Update100  for script startup
+// Runtime.UpdateFrequency = UpdateFrequency.Update10 | UpdateFrequency.Update100  for the script functions.
+
+// Changed scriptExecutionTime = 180
+// Configured other functions to reduce load.
+
+
 // Keyword an inventory has to contain to be skipped by the sorting (= no items will be taken out)
-const string lockedContainerKeyword = "Locked";
+const string lockedContainerKeyword = "[Locked]";
 
 // Keyword an inventory has to contain to be excluded from item counting (used by autocrafting and inventory panels)
-const string hiddenContainerKeyword = "Hidden";
+const string hiddenContainerKeyword = "[Hidden]";
 
 // Keyword for connectors to disable sorting of a grid, that is docked to that connector.
 // This also disables the usage of refineries, arc furnaces and assemblers on that grid.
@@ -34,22 +43,22 @@ string noSortingKeyword = "[No Sorting]";
 bool balanceTypeContainers = false;
 
 // Show a fill level in the container's name?
-bool showFillLevel = true;
+bool showFillLevel = false;
 
 // Tag inventories, that have no access to the main type containers with [No Conveyor]?
-bool showNoConveyorTag = true;
+bool showNoConveyorTag = false;
 
 // Auto assign new containers if a type is full or not present?
-bool autoAssignContainers = true;
+bool autoAssignContainers = false;
 
 // Auto assign ores and ingots containers as one?
-bool oresIngotsInOne = true;
+bool oresIngotsInOne = false;
 
 // Auto assign tool, ammo and bottle containers as one?
-bool toolsAmmoBottlesInOne = true;
+bool toolsAmmoBottlesInOne = false;
 
 // Fill bottles before storing them in the bottle container?
-bool fillBottles = true;
+bool fillBottles = false;
 
 
 // --- Autocrafting ---
@@ -62,7 +71,7 @@ bool enableAutodisassembling = false;
 
 // A LCD with the keyword "Autocrafting" is required where you can set the wanted amount!
 // This has multi LCD support. Just append numbers after the keyword, like: "LCD Autocrafting 1", "LCD Autocrafting 2", ..
-string autocraftingKeyword = "Autocrafting";
+string autocraftingKeyword = "AutoCrafting-Dori";
 
 // If you want an assembler to only assemble or only disassemble, use the following keywords in its name.
 // A assembler without a keyword will do both tasks
@@ -91,10 +100,10 @@ bool headerOnEveryScreen = false;
 // to the custom data of the first autocrafting LCD. To let them reappear on the LCD again, remove the entry from the custom data.
 
 // Sort the assembler queue based on the most needed components?
-bool sortAssemblerQueue = true;
+bool sortAssemblerQueue = false;
 
 // Autocraft ingots from stone in survival kits until you have proper refineries?
-bool enableBasicIngotCrafting = true;
+bool enableBasicIngotCrafting = false;
 
 // Disable autocrafting in survival kits when you have regular assemblers?
 bool disableBasicAutocrafting = true;
@@ -108,7 +117,7 @@ bool disableBasicAutocrafting = true;
 const string specialContainerKeyword = "Special";
 
 // Are special containers allowed to 'steal' items from other special containers with a lower priority?
-bool allowSpecialSteal = true;
+bool allowSpecialSteal = false;
 
 
 // --- Refinery handling ---
@@ -116,11 +125,11 @@ bool allowSpecialSteal = true;
 
 // By enabling ore balancing, the script will balance the ores between all refinieres so that every refinery has the same amount of ore in it.
 // To still use a refinery manually, add the manualMachineKeyword to it (by default: "!manual")
-bool enableOreBalancing = true;
+bool enableOreBalancing = false;
 
 // Enable script assisted refinery filling? This will move in the most needed ore and will make room, if the refinery is already full
 // Also, the script puts as many ores into the refinery as possible and will pull ores even from other refineries if needed.
-bool enableScriptRefineryFilling = true;
+bool enableScriptRefineryFilling = false;
 
 // Sort the refinery queue based on the most needed ingots?
 bool sortRefiningQueue = true;
@@ -131,16 +140,16 @@ bool sortRefiningQueue = true;
 // By default stone is enabled and will always be refined first.
 List<String> fixedRefiningList = new List<string> {
 	"Stone",
-	//"Iron",
+	"Scrap",
+	"Iron",
 	//"Nickel",
 	//"Cobalt",
 	//"Silicon",
 	//"Uranium",
 	//"Silver",
-	//"Gold",
-	//"Platinum",
-	//"Magnesium",
-	//"Scrap",
+	"Gold",
+	"Platinum",
+	"Magnesium",
 };
 
 
@@ -149,7 +158,7 @@ List<String> fixedRefiningList = new List<string> {
 
 // Enable balancing of ice in O2/H2 generators?
 // All O2/H2 generators will be used. To use one manually, add the manualMachineKeyword to it (by default: "!manual")
-bool enableIceBalancing = true;
+bool enableIceBalancing = false;
 
 // Put ice into O2/H2 generators that are turned off? (default: false)
 bool fillOfflineGenerators = false;
@@ -164,7 +173,7 @@ double iceFillLevelPercentage = 90;
 
 // Enable balancing of uranium in reactors? (Note: conveyors of reactors are turned off to stop them from pulling more)
 // All reactors will be used. To use one manually, add the manualMachineKeyword to it (by default: "!manual")
-bool enableUraniumBalancing = true;
+bool enableUraniumBalancing = false;
 
 // Put uranium into reactors that are turned off? (default: false)
 bool fillOfflineReactors = false;
@@ -212,17 +221,17 @@ string sortingPattern = "Na";
 
 // To display the main script informations, add the following keyword to any LCD name (default: !IIM-main).
 // You can enable or disable specific informations on the LCD by editing its custom data.
-string mainLCDKeyword = "!IIM-main";
+string mainLCDKeyword = "!main";
 
 // To display current item amounts of different types, add the following keyword to any LCD name
 // and follow the on screen instructions.
-string inventoryLCDKeyword = "!IIM-inventory";
+string inventoryLCDKeyword = "!!!inventory";
 
 // To display all current warnings and problems, add the following keyword to any LCD name (default: IIM-warnings).
-string warningsLCDKeyword = "!IIM-warnings";
+string warningsLCDKeyword = "!warnings";
 
 // To display the script performance (PB terminal output), add the following keyword to any LCD name (default: !IIM-performance).
-string performanceLCDKeyword = "!IIM-performance";
+string performanceLCDKeyword = "!performance";
 
 // Default screen font and fontsize, when a screen is first initialized. Fonts: "Debug" or "Monospace"
 string defaultFont = "Debug";
@@ -233,13 +242,13 @@ float defaultFontSize = 0.6f;
 // =======================================================================================
 
 // Script cycle time in seconds (default: 9).
-double scriptExecutionTime = 9;
+double scriptExecutionTime = 150;
 
 // Script mode: "ship", "station" or blank for autodetect
 string scriptMode = "";
 
 // Protect type containers when docking to another grid running the script?
-bool protectTypeContainers = true;
+bool protectTypeContainers = false;
 
 // If you want to use a machine manually, append the keyword to it.
 // This works for assemblers, refineries, reactors and O2/H2 generators
@@ -274,7 +283,7 @@ IMyTerminalBlock>();string[]ƽ={"showHeading=true","showWarnings=true","showCont
 ){{"oreContainer",oreContainerKeyword},{"ingotContainer",ingotContainerKeyword},{"componentContainer",
 componentContainerKeyword},{"toolContainer",toolContainerKeyword},{"ammoContainer",ammoContainerKeyword},{"bottleContainer",
 bottleContainerKeyword},{"lockedContainer",lockedContainerKeyword},{"specialContainer",specialContainerKeyword},{"oreBalancing","true"},{
-"iceBalancing","true"},{"uraniumBalancing","true"}};string ɒ="Isy's Autocrafting";string ɓ=
+"iceBalancing","true"},{"uraniumBalancing","true"}};string ɒ="Isys/Dori Autocrafting";string ɓ=
 "Remove a line to show this item on the LCD again!";char[]ɔ={'=','>','<'};IMyAssembler ɕ;string ɖ="";MyDefinitionId ɗ;List<String>ɘ=new List<string>{"Uranium","Silicon",
 "Silver","Gold","Platinum","Magnesium","Iron","Nickel","Cobalt","Stone","Scrap"};List<MyItemType>ə=new List<MyItemType>();List<
 MyItemType>ɛ=new List<MyItemType>();Dictionary<string,double>Ȱ=new Dictionary<string,double>(){{"Cobalt",0.3},{"Gold",0.01},{
@@ -294,9 +303,9 @@ string Ǿ="ship_mode;\n";string ǿ="[PROTECTED] ";string Ȁ="";string ȁ="";stri
 "Container balancing","Internal sorting","Add fill level to names","Get global item amount","Get assembler queue","Autocrafting",
 "Sort assembler queue","Clean up assemblers","Learn unknown blueprints","Fill refineries","Ore balancing","Ice balancing","Uranium balancing"}
 ;Program(){Echo("Script ready to be launched..\n");assembleMargin/=100;disassembleMargin/=100;ɋ=(int)Math.Floor(
-scriptExecutionTime/9.5);Runtime.UpdateFrequency=UpdateFrequency.Update10;}void Main(string Ǔ){if(Ʉ>=10){throw new Exception(
-"Too many errors in script step "+Ɍ+":\n"+ȅ[Ɍ]+"\n\nPlease recompile!\nScript stoppped!\n\nLast error:\n"+Ʌ+"\n");}try{Ƶ("",true);if(ɍ){Runtime.
-UpdateFrequency=UpdateFrequency.Update100;if(Ɍ>0)Echo("Initializing script.. ("+(Ɍ+1)+"/10) \n");if(Ɍ>=2){Echo(
+scriptExecutionTime/9.5);Runtime.UpdateFrequency = UpdateFrequency.Update10 | UpdateFrequency.Update100;}void Main(string Ǔ){if(Ʉ>=10){throw new Exception(
+"Too many errors in script step "+Ɍ+":\n"+ȅ[Ɍ]+"\n\nPlease recompile!\nScript stoppped!\n\nLast error:\n"+Ʌ+"\n");}try{Ƶ("",true);if(ɍ){Runtime.UpdateFrequency |= UpdateFrequency.Update100;
+if(Ɍ>0)Echo("Initializing script.. ("+(Ɍ+1)+"/10) \n");if(Ɍ>=2){Echo(
 "Getting inventory blocks..");if(Ɍ==2)ș();}if(Ɍ>=3){Echo("Loading saved items..");if(Ɍ==3){if(!Ø()){Echo("-> No assembler found!");Echo(
 "-> Can't check saved blueprints..");Echo("\nScript stopped!");Me.Enabled=false;return;}}}if(Ɍ>=4){Echo("Clearing assembler queues..");if(Ɍ==4&&(
 enableAutocrafting||enableAutodisassembling)){GridTerminalSystem.GetBlocksOfType<IMyTextPanel>(ɣ,e=>e.IsSameConstructAs(Me)&&e.CustomName.
@@ -304,7 +313,7 @@ Contains(autocraftingKeyword));if(ɣ.Count>0){foreach(var Ā in ɝ){Ā.Mode=MyAs
 MyAssemblerMode.Assembly;Ā.ClearQueue();}}}}if(Ɍ>=5){Echo("Checking blueprints..");if(Ɍ==5){foreach(var H in ǭ){Ɩ(H);}}}if(Ɍ>=6){Echo(
 "Checking type containers..");if(Ɍ==6)ȡ();}if(Ɍ>=7){if(scriptMode=="station"){Ǽ=true;}else if(Me.CubeGrid.IsStatic&&scriptMode!="ship"){Ǽ=true;}Echo
 ("Setting script mode to: "+(Ǽ?"station..":"ship.."));if(Ɍ==7)Me.CustomData=(Ǽ?ǽ:Ǿ)+Me.CustomData.Replace(ǽ,"").Replace(Ǿ
-,"");}if(Ɍ>=8){Echo("Starting script..");}if(Ɍ>=9){Runtime.UpdateFrequency=UpdateFrequency.Update10;Ɍ=0;ɍ=false;return;}Ɍ
+,"");}if(Ɍ>=8){Echo("Starting script..");}if(Ɍ>=9){Runtime.UpdateFrequency = UpdateFrequency.Update10 | UpdateFrequency.Update100;Ɍ=0;ɍ=false;return;}Ɍ
 ++;return;}if(Ǔ!=""){Ȃ=Ǔ;Ɍ=1;ȁ="";ȃ=DateTime.Now;}if(ɚ<ɋ){ɚ++;return;}if(Ɏ){if(ɏ==0)ú();if(ɏ==1)į();if(ɏ==2)ĳ();if(ɏ==3)ĵ(
 );if(ɏ>3)ɏ=0;Ɏ=false;return;}if(Ɍ==0||Ɇ){if(!ɇ)ș();Ɇ=false;ɇ=false;if(!ƻ(30)){ȿ=Ƽ(mainLCDKeyword,ƽ);ɀ=Ƽ(
 warningsLCDKeyword,Ƀ);Ɂ=Ƽ(performanceLCDKeyword,Ƀ);ɂ=Ƽ(inventoryLCDKeyword);}else{Ɇ=true;ɇ=true;}if(Ɍ==0){Ƶ(ȅ[Ɍ]);z();Ɍ++;}return;}if(!Ǽ)Ǚ
@@ -489,7 +498,7 @@ IMyTerminalBlock M=null;if(allowSpecialSteal){M=K(H,true,ɭ[ƃ]);}else{M=K(H);}i
 Replace("  "," ");}if(ʿ!=ʾ)N.CustomName=ʿ;}}StringBuilder ˁ(){if(ɣ.Count>1){string ˆ=@"("+autocraftingKeyword+@" *)(\d*)";ɣ.
 Sort((Ț,ŏ)=>System.Text.RegularExpressions.Regex.Match(Ț.CustomName,ˆ).Groups[2].Value.CompareTo(System.Text.
 RegularExpressions.Regex.Match(ŏ.CustomName,ˆ).Groups[2].Value));}StringBuilder û=new StringBuilder();if(!ɣ[0].GetText().Contains(
-"Isy's Autocrafting")){ɣ[0].Font=defaultFont;ɣ[0].FontSize=defaultFontSize;}foreach(var e in ɣ){û.Append(e.GetText()+"\n");e.
+"Isys/Dori Autocrafting")){ɣ[0].Font=defaultFont;ɣ[0].FontSize=defaultFontSize;}foreach(var e in ɣ){û.Append(e.GetText()+"\n");e.
 WritePublicTitle("Craft item manually once to show up here");e.FontSize=ɣ[0].FontSize;e.Font=ɣ[0].Font;e.Alignment=VRage.Game.GUI.
 TextPanel.TextAlignment.LEFT;e.ContentType=VRage.Game.GUI.TextPanel.ContentType.TEXT_AND_IMAGE;}List<string>ˇ=û.ToString().Split(
 '\n').ToList();List<string>Ð=ɣ[0].CustomData.Split('\n').ToList();ˇ.RemoveAll(Ñ=>Ñ.IndexOfAny(ɔ)<=0);foreach(var Ë in ɤ){
@@ -600,7 +609,7 @@ IMyTerminalBlock Á=O(đ,ɧ);if(Á!=null){double Ĕ=Ē-ē;Ê(ď,đ,0,Á,0,Ĕ);}}
 CubeGrid.GridSize==0.5f)Ę=ĕ*uraniumAmountSmallGrid;if(ė>Ę+0.05){foreach(var ę in ɢ){if(Ė==ę)continue;double Ě=G(č,ę);double Ĝ=ĕ*
 uraniumAmountLargeGrid;if(ę.CubeGrid.GridSize==0.5f)Ĝ=ĕ*uraniumAmountSmallGrid;if(Ě<Ĝ-0.05){ė=G(č,Ė);double Ď=Ĝ-Ě;if(ė-Ď>=Ę){Ê(ď,Ė,0,ę,0,Ď);
 continue;}if(ė-Ď<Ę){Ď=ė-Ę;Ê(ď,Ė,0,ę,0,Ď);break;}}}}}}StringBuilder ā(IMyTextSurface e,bool ì=true,bool í=true,bool î=true,bool ë
-=true,bool ï=true){bool ð=false;StringBuilder q=new StringBuilder();if(ì){q.Append("Isy's Inventory Manager\n");q.Append(
+=true,bool ï=true){bool ð=false;StringBuilder q=new StringBuilder();if(ì){q.Append("Isys/Dori Inventory Manager\n");q.Append(
 e.ń('=',e.Š(q))).Append("\n\n");}if(í&&Ĳ!=null){q.Append("Warning!\n"+Ĳ+"\n\n");ð=true;}if(î){q.Append(ò(e,ɦ,"Ores"));q.
 Append(ò(e,ɧ,"Ingots"));q.Append(ò(e,ɨ,"Components"));q.Append(ò(e,ɩ,"Tools"));q.Append(ò(e,ɪ,"Ammo"));q.Append(ò(e,ɫ,
 "Bottles"));q.Append("=> "+ȶ.Count+" type containers: Balancing "+(balanceTypeContainers?"ON":"OFF")+"\n\n");ð=true;}if(ë){q.
@@ -628,12 +637,12 @@ StringBuilder İ=new StringBuilder();if(Ɉ.Count==0){İ.Append("- No problems de
 var ý in ü){var þ=ý.Key;var ÿ=ý.Value;if(!þ.GetText().EndsWith("\a")){þ.Font=defaultFont;þ.FontSize=defaultFontSize;þ.
 Alignment=VRage.Game.GUI.TextPanel.TextAlignment.LEFT;þ.ContentType=VRage.Game.GUI.TextPanel.ContentType.TEXT_AND_IMAGE;}bool ì=ÿ
 .Ɔ("showHeading");bool ĝ=ÿ.Ɔ("scrollTextIfNeeded");StringBuilder q=new StringBuilder();if(ì){q.Append(
-"Isy's Inventory Manager Warnings\n");q.Append(þ.ń('=',þ.Š(q))).Append("\n\n");}q.Append(İ);q=þ.Ŋ(q,ì?3:0,ĝ);þ.WriteText(q.Append("\a"));}}ɏ++;ɷ=0;}void ĳ()
+"Isys/Dori Inventory Manager Warnings\n");q.Append(þ.ń('=',þ.Š(q))).Append("\n\n");}q.Append(İ);q=þ.Ŋ(q,ì?3:0,ĝ);þ.WriteText(q.Append("\a"));}}ɏ++;ɷ=0;}void ĳ()
 {if(Ɂ.Count==0){ɏ++;return;}for(int X=ɸ;X<Ɂ.Count;X++){if(ƻ())return;ɸ++;var ü=Ɂ[X].ż(performanceLCDKeyword);foreach(var
 ý in ü){var þ=ý.Key;var ÿ=ý.Value;if(!þ.GetText().EndsWith("\a")){þ.Font=defaultFont;þ.FontSize=defaultFontSize;þ.
 Alignment=VRage.Game.GUI.TextPanel.TextAlignment.LEFT;þ.ContentType=VRage.Game.GUI.TextPanel.ContentType.TEXT_AND_IMAGE;}bool ì=ÿ
 .Ɔ("showHeading");bool ĝ=ÿ.Ɔ("scrollTextIfNeeded");StringBuilder q=new StringBuilder();if(ì){q.Append(
-"Isy's Inventory Manager Performance\n");q.Append(þ.ń('=',þ.Š(q))).Append("\n\n");}q.Append(ƭ);q=þ.Ŋ(q,ì?3:0,ĝ);þ.WriteText(q.Append("\a"));}}ɏ++;ɸ=0;}void ĵ()
+"Isys/Dori Inventory Manager Performance\n");q.Append(þ.ń('=',þ.Š(q))).Append("\n\n");}q.Append(ƭ);q=þ.Ŋ(q,ì?3:0,ĝ);þ.WriteText(q.Append("\a"));}}ɏ++;ɸ=0;}void ĵ()
 {if(ɂ.Count==0){ɏ++;return;}Dictionary<IMyTextSurface,string>Ķ=new Dictionary<IMyTextSurface,string>();Dictionary<
 IMyTextSurface,string>ķ=new Dictionary<IMyTextSurface,string>();List<IMyTextSurface>ĸ=new List<IMyTextSurface>();List<IMyTextSurface>Ĺ
 =new List<IMyTextSurface>();foreach(var I in ɂ){var ü=I.ż(inventoryLCDKeyword);foreach(var ý in ü){if(ý.Value.Contains(
@@ -664,7 +673,7 @@ bool o=false,bool d=false){StringBuilder q=new StringBuilder();bool r=h==-1?true
 ToLower().Contains(f.ToLower())){if(q.Length==0&&!k){string v="Items containing '"+char.ToUpper(f[0])+f.Substring(1).ToLower()+
 "'\n\n";q.Append(e.ń(' ',(e.Ń()-e.Š(v))/2)).Append(v);}double w=G(u);if(w==0&&o)continue;if(r)h=Ƒ(u);q.Append(Ǆ(e,u.SubtypeId.
 ToString(),w,h,w.ů(),h.ů(),m,d));}}if(q.Length==0){q.Append("Error!\n\n");q.Append("No items containing '"+f+
-"' found!\nCheck the custom data of this LCD and enter a valid type or item name!\n");}return q;}void z(){if(ƴ==99){ƴ=0;}else{ƴ++;}Echo("Isy's Inventory Manager "+Ɋ[Ⱦ]+"\n====================\n");if(Ĳ!=
+"' found!\nCheck the custom data of this LCD and enter a valid type or item name!\n");}return q;}void z(){if(ƴ==99){ƴ=0;}else{ƴ++;}Echo("Isys/Dori Inventory Manager "+Ɋ[Ⱦ]+"\n====================\n");if(Ĳ!=
 null){Echo("Warning!\n"+Ĳ+"\n");}StringBuilder q=new StringBuilder();q.Append("Script is running in "+(Ǽ?"station":"ship")+
 " mode\n\n");q.Append("Task: "+ȅ[Ɍ]+"\n");q.Append("Script step: "+Ɍ+" / "+(ȅ.Length-1)+"\n\n");ƭ=q.Append(ƭ);if(ɥ.Count>0){ƭ.
 Append("Excluded grids:\n============\n\n");foreach(var µ in ɥ){ƭ.Append(µ.CustomName+"\n");}}Echo(ƭ.ToString());if(ȿ.Count==0
